@@ -25,7 +25,7 @@
           <button
             class="delete is-small"
             type="button"
-            @click="deleteDropFile(index)"
+            @click="deleteDropFile()"
           />
         </span>
       </div>
@@ -37,18 +37,16 @@
       <table class="table">
         <thead>
           <tr>
-            <th>氏名</th>
-            <th>カタカナ</th>
-            <th>生年月日</th>
-            <th>会社名</th>
+            <th>管理番号</th>
+            <th>hoge</th>
+            <th>fuga</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in csvData" :key="item.id">
-            <td>{{ item.lastname }} {{ item.firstname }}</td>
-            <td>{{ item.lastkana }} {{ item.firstkana }}</td>
-            <td>{{ item.birthday }}</td>
-            <td>{{ item.company }}</td>
+            <td>{{ item.kanri_id }}</td>
+            <td>{{ item.hoge }}</td>
+            <td>{{ item.fuga }}</td>
           </tr>
         </tbody>
       </table>
@@ -57,6 +55,11 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import VuePapaParse from 'vue-papa-parse'
+import iconv from 'iconv-lite';
+Vue.use(VuePapaParse)
+
 export default {
   name: 'UploadForm',
   data () {
@@ -67,7 +70,8 @@ export default {
   },
   methods: {
     // アップロードしたファイル削除用
-    deleteDropFile (index) {
+    deleteDropFile () {
+      console.log("start drop file..");
       this.dropFile = null
     },
     // アップロードしたcsvファイルをcsvDataに格納する用
@@ -78,27 +82,25 @@ export default {
       const reader = new FileReader()
 
       const loadCSV = () => {
-        const lines = reader.result.split('\n') // 改行毎にデータを分ける
+        const sjisCsv = iconv.decode(reader.result, "Shift_JIS");
+        const parsedCsv = this.$papa.parse(sjisCsv);
+        const lines = parsedCsv.data
         lines.shift() // csvファイルの先頭（ヘッダ）を削除
         // csvファイルの各行をcsvDataにオブジェクトとしてpushする
         lines.forEach((element, index) => {
-          const workerData = element.split(',') // 区切り文字はカンマ
-          if (workerData.length !== 6) { return } // 読み込んだ行のデータが欠けている場合は無視
+          const workerData = element
           this.csvData.push(
             {
               id: index,
-              lastname: workerData[0],
-              firstname: workerData[1],
-              lastkana: workerData[2],
-              firstkana: workerData[3],
-              birthday: new Date(workerData[4]),
-              company: workerData[5]
+              kanri_id: workerData[1],
+              hoge: workerData[5],
+              fuga: workerData[7],
             }
           )
         })
       }
       reader.onload = loadCSV
-      reader.readAsText(csvfile)
+      reader.readAsBinaryString(csvfile)
     }
   }
 }
