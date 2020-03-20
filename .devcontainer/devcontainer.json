@@ -1,0 +1,46 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+  "name": "csv",
+  "dockerFile": "Dockerfile",
+  "postCreateCommand": "yarn install",
+  "mounts": [],
+  "appPort": ["3000:3000"],
+  "extensions": [
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    "codezombiech.gitignore",
+    "esbenp.prettier-vscode",
+    "mgesbert.python-path",
+    "visualstudioexptteam.vscodeintellicode",
+    "oderwat.indent-rainbow",
+    "exiasr.hadolint",
+    "vtrois.gitmoji-vscode",
+    "mhutchie.git-graph",
+    "howardzuo.vscode-git-tags",
+    "gruntfuggly.todo-tree",
+    "aws-scripting-guy.cform",
+    "amazonwebservices.aws-toolkit-vscode",
+    "danielthielking.aws-cloudformation-yaml",
+    "davidanson.vscode-markdownlint",
+    "stackery.stackery",
+    "octref.vetur",
+    "dbaeumer.vscode-eslint",
+    "sdras.vue-vscode-snippets",
+    "dariofuzinato.vue-peek",
+    "christian-kohler.npm-intellisense",
+    "eg2.vscode-npm-script",
+    "pmneo.tsimporter",
+    "christian-kohler.path-intellisense",
+    "wix.vscode-import-cost"
+  ],
+  "settings": {
+    "typescript.tsdk": "/usr/local/lib/node_modules/typescript/lib",
+    "eslint.nodePath": "./node_modules",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "vetur.format.defaultFormatter.html": "prettier",
+    "javascript.format.enable": false,
+    "vetur.useWorkspaceDependencies": true
+  }
+}
