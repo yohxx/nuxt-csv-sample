@@ -80,18 +80,11 @@ export default {
         lines.shift(); // csvファイルの先頭（ヘッダ）を削除
         // csvファイルの各行をcsvDataにオブジェクトとしてpushする
         lines.forEach((element, index) => {
-          const workerData = element;
-          // this.csvData[workerData[1]] = {
-          //   kanri_id: workerData[1],
-          //   hoge: workerData[5],
-          //   fuga: workerData[7]
-          // };
-          // console.log(this.csvData);
           this.csvData.push({
             id: index,
-            kanri_id: workerData[1],
-            hoge: workerData[5],
-            fuga: workerData[7]
+            kanri_id: element[1],
+            hoge: element[5],
+            fuga: element[7]
           });
         });
       };

@@ -4,7 +4,7 @@
       <b-button type="is-warning" @click="calculation()">
         計算
       </b-button>
-      <vue-json-to-csv :json-data="[]">
+      <vue-json-to-csv :json-data="resultCsv">
         <b-button type="is-success">
           ダウンロード
         </b-button>
