@@ -51,6 +51,13 @@
         </tbody>
       </table>
     </div>
+    <div class="download">
+      <vue-json-to-csv :json-data=csvData>
+        <b-button type="is-success">
+          ダウンロード
+        </b-button>
+      </vue-json-to-csv>
+    </div>
   </section>
 </template>
 
@@ -58,7 +65,9 @@
 import Vue from 'vue'
 import VuePapaParse from 'vue-papa-parse'
 import iconv from 'iconv-lite';
+import VueJsonToCsv from 'vue-json-to-csv'
 Vue.use(VuePapaParse)
+Vue.use(VueJsonToCsv)
 
 export default {
   name: 'UploadForm',
@@ -67,6 +76,9 @@ export default {
       dropFile: null,
       csvData: [] // csvデータ格納用
     }
+  },
+  components: {
+    VueJsonToCsv
   },
   methods: {
     // アップロードしたファイル削除用
@@ -101,6 +113,9 @@ export default {
       }
       reader.onload = loadCSV
       reader.readAsBinaryString(csvfile)
+    },
+    downloadCsv () {
+      console.log('Download CSV');
     }
   }
 }
