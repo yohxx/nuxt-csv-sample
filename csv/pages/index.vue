@@ -1,168 +1,71 @@
 <template>
   <section class="section">
-    <div class="columns">
-      <div class="column">
-        <b-field>
-          <b-upload v-model="dropFile" drag-drop>
-            <section class="section">
-              <div class="content has-text-centered">
-                <p>
-                  <b-icon icon="upload" size="is-large" />
-                </p>
-                <p>
-                  ファイルをドロップするか、ここをクリックしてアップロードするファイルを選択してください。
-                </p>
-              </div>
-            </section>
-          </b-upload>
-        </b-field>
-        <div v-if="dropFile" class="block">
-          <div class="tags">
-            <span class="tag is-primary">
-              {{ dropFile.name }}
-              <button
-                class="delete is-small"
-                type="button"
-                @click="deleteDropFile()"
-              />
-            </span>
-          </div>
-          <button class="button is-primary" @click="uploadedData()">
-            読み込む
-          </button>
-        </div>
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>管理番号</th>
-                <th>hoge</th>
-                <th>fuga</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in csvData" :key="item.id">
-                <td>{{ item.kanri_id }}</td>
-                <td>{{ item.hoge }}</td>
-                <td>{{ item.fuga }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="column">
-        <b-field>
-          <b-upload v-model="dropFile" drag-drop>
-            <section class="section">
-              <div class="content has-text-centered">
-                <p>
-                  <b-icon icon="upload" size="is-large" />
-                </p>
-                <p>
-                  ファイルをドロップするか、ここをクリックしてアップロードするファイルを選択してください。
-                </p>
-              </div>
-            </section>
-          </b-upload>
-        </b-field>
-        <div v-if="dropFile" class="block">
-          <div class="tags">
-            <span class="tag is-primary">
-              {{ dropFile.name }}
-              <button
-                class="delete is-small"
-                type="button"
-                @click="deleteDropFile()"
-              />
-            </span>
-          </div>
-          <button class="button is-primary" @click="uploadedData()">
-            読み込む
-          </button>
-        </div>
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>管理番号</th>
-                <th>hoge</th>
-                <th>fuga</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in csvData" :key="item.id">
-                <td>{{ item.kanri_id }}</td>
-                <td>{{ item.hoge }}</td>
-                <td>{{ item.fuga }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
     <div class="download">
-      <vue-json-to-csv :json-data="csvData">
+      <b-button type="is-warning" @click="calculation()">
+        計算
+      </b-button>
+      <vue-json-to-csv :json-data="[]">
         <b-button type="is-success">
           ダウンロード
         </b-button>
       </vue-json-to-csv>
+    </div>
+    <div class="columns">
+      <csv-uploader ref="allItem" />
+      <csv-uploader ref="excludeItem" />
     </div>
   </section>
 </template>
 
 <script>
 import Vue from "vue";
-import VuePapaParse from "vue-papa-parse";
-import iconv from "iconv-lite";
 import VueJsonToCsv from "vue-json-to-csv";
-Vue.use(VuePapaParse);
+import CsvUploader from "~/components/CsvUploader.vue";
 Vue.use(VueJsonToCsv);
 
 export default {
   name: "UploadForm",
   data() {
     return {
-      dropFile: null,
-      csvData: [] // csvデータ格納用
+      resultCsv: [], // 計算結果データ
+      allItemCsv: [], // csvデータ格納用
+      excludeItemCsv: [] // csvデータ格納用
     };
   },
   components: {
-    VueJsonToCsv
+    VueJsonToCsv,
+    CsvUploader
   },
   methods: {
-    // アップロードしたファイル削除用
-    deleteDropFile() {
-      console.log("start drop file..");
-      this.dropFile = null;
-    },
-    // アップロードしたcsvファイルをcsvDataに格納する用
-    uploadedData() {
-      console.log("start upload..");
-      this.csvData = []; // csvDataを初期化
-      const csvfile = this.dropFile;
-      const reader = new FileReader();
-
-      const loadCSV = () => {
-        const sjisCsv = iconv.decode(reader.result, "Shift_JIS");
-        const parsedCsv = this.$papa.parse(sjisCsv);
-        const lines = parsedCsv.data;
-        lines.shift(); // csvファイルの先頭（ヘッダ）を削除
-        // csvファイルの各行をcsvDataにオブジェクトとしてpushする
-        lines.forEach((element, index) => {
-          const workerData = element;
-          this.csvData.push({
-            id: index,
-            kanri_id: workerData[1],
-            hoge: workerData[5],
-            fuga: workerData[7]
-          });
-        });
-      };
-      reader.onload = loadCSV;
-      reader.readAsBinaryString(csvfile);
-    },
     downloadCsv() {
       console.log("Download CSV");
+    },
+    calculation() {
+      console.log("Calculation..");
+      this.allItemCsv = this.$refs.allItem.getCsv();
+      this.excludeItemCsv = this.$refs.excludeItem.getCsv();
+      let items = [];
+      this.allItemCsv.forEach(item => {
+        if (item.kanri_id == undefined) {
+          return;
+        }
+        items[item.kanri_id] = item;
+      });
+
+      this.excludeItemCsv.forEach(element => {
+        if (element.kanri_id == undefined) {
+          return;
+        }
+        console.log(element.kanri_id);
+
+        if (items[element.kanri_id] != undefined) {
+          console.log("delete:" + element.kanri_id);
+          delete items[element.kanri_id];
+        }
+      });
+      console.log(items);
+      this.resultCsv.push(items);
+      console.log(this.resultCsv);
     }
   }
 };
