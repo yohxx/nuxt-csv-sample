@@ -1,58 +1,107 @@
 <template>
   <section class="section">
-    <b-field>
-      <b-upload
-        v-model="dropFile"
-        drag-drop
-      >
-        <section class="section">
-          <div class="content has-text-centered">
-            <p>
-              <b-icon
-                icon="upload"
-                size="is-large"
+    <div class="columns">
+      <div class="column">
+        <b-field>
+          <b-upload v-model="dropFile" drag-drop>
+            <section class="section">
+              <div class="content has-text-centered">
+                <p>
+                  <b-icon icon="upload" size="is-large" />
+                </p>
+                <p>
+                  ファイルをドロップするか、ここをクリックしてアップロードするファイルを選択してください。
+                </p>
+              </div>
+            </section>
+          </b-upload>
+        </b-field>
+        <div v-if="dropFile" class="block">
+          <div class="tags">
+            <span class="tag is-primary">
+              {{ dropFile.name }}
+              <button
+                class="delete is-small"
+                type="button"
+                @click="deleteDropFile()"
               />
-            </p>
-            <p>ファイルをドロップするか、ここをクリックしてアップロードするファイルを選択してください。</p>
+            </span>
           </div>
-        </section>
-      </b-upload>
-    </b-field>
-    <div v-if="dropFile" class="block">
-      <div class="tags">
-        <span class="tag is-primary">
-          {{ dropFile.name }}
-          <button
-            class="delete is-small"
-            type="button"
-            @click="deleteDropFile()"
-          />
-        </span>
+          <button class="button is-primary" @click="uploadedData()">
+            読み込む
+          </button>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>管理番号</th>
+                <th>hoge</th>
+                <th>fuga</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in csvData" :key="item.id">
+                <td>{{ item.kanri_id }}</td>
+                <td>{{ item.hoge }}</td>
+                <td>{{ item.fuga }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <button class="button is-primary" @click="uploadedData()">
-        読み込む
-      </button>
-    </div>
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>管理番号</th>
-            <th>hoge</th>
-            <th>fuga</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in csvData" :key="item.id">
-            <td>{{ item.kanri_id }}</td>
-            <td>{{ item.hoge }}</td>
-            <td>{{ item.fuga }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="column">
+        <b-field>
+          <b-upload v-model="dropFile" drag-drop>
+            <section class="section">
+              <div class="content has-text-centered">
+                <p>
+                  <b-icon icon="upload" size="is-large" />
+                </p>
+                <p>
+                  ファイルをドロップするか、ここをクリックしてアップロードするファイルを選択してください。
+                </p>
+              </div>
+            </section>
+          </b-upload>
+        </b-field>
+        <div v-if="dropFile" class="block">
+          <div class="tags">
+            <span class="tag is-primary">
+              {{ dropFile.name }}
+              <button
+                class="delete is-small"
+                type="button"
+                @click="deleteDropFile()"
+              />
+            </span>
+          </div>
+          <button class="button is-primary" @click="uploadedData()">
+            読み込む
+          </button>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>管理番号</th>
+                <th>hoge</th>
+                <th>fuga</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in csvData" :key="item.id">
+                <td>{{ item.kanri_id }}</td>
+                <td>{{ item.hoge }}</td>
+                <td>{{ item.fuga }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
     <div class="download">
-      <vue-json-to-csv :json-data=csvData>
+      <vue-json-to-csv :json-data="csvData">
         <b-button type="is-success">
           ダウンロード
         </b-button>
@@ -62,61 +111,59 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import VuePapaParse from 'vue-papa-parse'
-import iconv from 'iconv-lite';
-import VueJsonToCsv from 'vue-json-to-csv'
-Vue.use(VuePapaParse)
-Vue.use(VueJsonToCsv)
+import Vue from "vue";
+import VuePapaParse from "vue-papa-parse";
+import iconv from "iconv-lite";
+import VueJsonToCsv from "vue-json-to-csv";
+Vue.use(VuePapaParse);
+Vue.use(VueJsonToCsv);
 
 export default {
-  name: 'UploadForm',
-  data () {
+  name: "UploadForm",
+  data() {
     return {
       dropFile: null,
       csvData: [] // csvデータ格納用
-    }
+    };
   },
   components: {
     VueJsonToCsv
   },
   methods: {
     // アップロードしたファイル削除用
-    deleteDropFile () {
+    deleteDropFile() {
       console.log("start drop file..");
-      this.dropFile = null
+      this.dropFile = null;
     },
     // アップロードしたcsvファイルをcsvDataに格納する用
-    uploadedData () {
+    uploadedData() {
       console.log("start upload..");
-      this.csvData = [] // csvDataを初期化
-      const csvfile = this.dropFile
-      const reader = new FileReader()
+      this.csvData = []; // csvDataを初期化
+      const csvfile = this.dropFile;
+      const reader = new FileReader();
 
       const loadCSV = () => {
         const sjisCsv = iconv.decode(reader.result, "Shift_JIS");
         const parsedCsv = this.$papa.parse(sjisCsv);
-        const lines = parsedCsv.data
-        lines.shift() // csvファイルの先頭（ヘッダ）を削除
+        const lines = parsedCsv.data;
+        lines.shift(); // csvファイルの先頭（ヘッダ）を削除
         // csvファイルの各行をcsvDataにオブジェクトとしてpushする
         lines.forEach((element, index) => {
-          const workerData = element
-          this.csvData.push(
-            {
-              id: index,
-              kanri_id: workerData[1],
-              hoge: workerData[5],
-              fuga: workerData[7],
-            }
-          )
-        })
-      }
-      reader.onload = loadCSV
-      reader.readAsBinaryString(csvfile)
+          const workerData = element;
+          this.csvData.push({
+            id: index,
+            kanri_id: workerData[1],
+            hoge: workerData[5],
+            fuga: workerData[7]
+          });
+        });
+      };
+      reader.onload = loadCSV;
+      reader.readAsBinaryString(csvfile);
     },
-    downloadCsv () {
-      console.log('Download CSV');
+    downloadCsv() {
+      console.log("Download CSV");
     }
   }
-}
+};
 </script>
