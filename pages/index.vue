@@ -2,7 +2,7 @@
   <section class="section">
     <div class="download">
       <b-button type="is-warning" @click="calculation()">
-        計算
+        計算TEST
       </b-button>
       <vue-json-to-csv :json-data="resultCsv">
         <b-button type="is-success">
