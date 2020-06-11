@@ -6,7 +6,7 @@
       </b-button>
       <vue-json-to-csv :json-data="resultCsv">
         <b-button type="is-success">
-          ダウンロード
+          ダウンロード01
         </b-button>
       </vue-json-to-csv>
     </div>
